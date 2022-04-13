@@ -18,10 +18,11 @@ def render():
 
     # glRotate(-36.264, -1, 0, 0)
     # glRotate(-45, 0, 1, 0)
+    # glTranslatef(-3., -3., -3.)
 
+    glTranslatef(0, 0, -np.sqrt(27))
     glRotate(-45, 0, 1, 0)
     glRotate(-36.264, -1, 0, 1)
-    glTranslatef(-3., -3., -3.)
 
     drawFrame()
 
