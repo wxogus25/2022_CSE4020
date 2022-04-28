@@ -191,6 +191,16 @@ def main():
     root = tree.getroot()
 
     # values setting
+    # set default values
+    viewDir = np.array([0, 0, -1]).astype(np.float)
+    viewUp = np.array([0, 1, 0]).astype(np.float)
+    # you can safely assume this. (no examples will use shifted perspective camera)
+    projNormal = -1*viewDir
+    viewWidth = 1.0
+    viewHeight = 1.0
+    projDistance = 1.0
+    # how bright the light is.
+    intensity = np.array([1, 1, 1]).astype(np.float)
 
     # set image value
     imgSize = np.array(root.findtext('image').split()).astype(np.int64)
