@@ -280,7 +280,7 @@ def main():
     width = 800
     height = 600
     window = glfw.create_window(
-        width, height, 'modern opengl example', None, None)
+        width, height, '2018009116-7-1', None, None)
     if not window:
         glfw.terminate()
         sys.exit(-1)
