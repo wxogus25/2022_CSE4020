@@ -427,8 +427,32 @@ def onMouseButton(window, button, state, mods):
             print("Right mouse click at (%d, %d)\n" % (x, y))
 
 
+def getPickInfo(window, x, y):
+    global cowModel, cursorOnCowBoundingBox, pickInfo
+    ray = screenCoordToRay(window, x, y)
+
+    planes = []
+    cow = cowModel
+    bbmin = cow.bbmin
+    bbmax = cow.bbmax
+
+    planes.append(makePlane(bbmin, bbmax, vector3(0, 1, 0)))
+    planes.append(makePlane(bbmin, bbmax, vector3(0, -1, 0)))
+    planes.append(makePlane(bbmin, bbmax, vector3(1, 0, 0)))
+    planes.append(makePlane(bbmin, bbmax, vector3(-1, 0, 0)))
+    planes.append(makePlane(bbmin, bbmax, vector3(0, 0, 1)))
+    planes.append(makePlane(bbmin, bbmax, vector3(0, 0, -1)))
+
+    o = ray.intersectsPlanes(planes)
+    cursorOnCowBoundingBox = o[0]
+    cowPickPosition = ray.getPoint(o[1])
+    cowPickLocalPos = transform(np.linalg.inv(cow2wld), cowPickPosition)
+    pickInfo = PickInfo(o[1], cowPickPosition, cow2wld, cowPickLocalPos)
+
+
 def onMouseDrag(window, x, y):
     global isDrag, cursorOnCowBoundingBox, pickInfo, cow2wld, isMove, previous
+
     if isDrag:
         print("in drag mode %d\n" % isDrag)
         if isDrag == V_DRAG:
@@ -440,7 +464,11 @@ def onMouseDrag(window, x, y):
                 ray = screenCoordToRay(window, x, y)
                 pp = pickInfo
                 if previous is None:
-                    previous = Plane(-ray.direction, pp.cowPickPosition)
+                    pass
+                    # tmp = -ray.direction
+                    # tmp[1] = 0
+                    # normalize(tmp)
+                previous = Plane(-ray.direction, pp.cowPickPosition)
                 c = ray.intersectsPlane(previous)
 
                 currentPos = ray.getPoint(c[1])
@@ -451,9 +479,9 @@ def onMouseDrag(window, x, y):
                 setTranslation(T, currentPos-pp.cowPickPosition)
                 cow2wld = T@pp.cowPickConfiguration
                 isMove = 1
+                getPickInfo(window, x, y)
             else:
                 isDrag = 0
-
         else:
             # horizontal dragging
             # Hint: read carefully the following block to implement vertical dragging.
@@ -471,28 +499,11 @@ def onMouseDrag(window, x, y):
                 setTranslation(T, currentPos-pp.cowPickPosition)
                 cow2wld = T@pp.cowPickConfiguration
                 isMove = 1
+                getPickInfo(window, x, y)
             else:
                 isDrag = 0
     else:
-        ray = screenCoordToRay(window, x, y)
-
-        planes = []
-        cow = cowModel
-        bbmin = cow.bbmin
-        bbmax = cow.bbmax
-
-        planes.append(makePlane(bbmin, bbmax, vector3(0, 1, 0)))
-        planes.append(makePlane(bbmin, bbmax, vector3(0, -1, 0)))
-        planes.append(makePlane(bbmin, bbmax, vector3(1, 0, 0)))
-        planes.append(makePlane(bbmin, bbmax, vector3(-1, 0, 0)))
-        planes.append(makePlane(bbmin, bbmax, vector3(0, 0, 1)))
-        planes.append(makePlane(bbmin, bbmax, vector3(0, 0, -1)))
-
-        o = ray.intersectsPlanes(planes)
-        cursorOnCowBoundingBox = o[0]
-        cowPickPosition = ray.getPoint(o[1])
-        cowPickLocalPos = transform(np.linalg.inv(cow2wld), cowPickPosition)
-        pickInfo = PickInfo(o[1], cowPickPosition, cow2wld, cowPickLocalPos)
+        getPickInfo(window, x, y)
 
 
 def screenCoordToRay(window, x, y):
