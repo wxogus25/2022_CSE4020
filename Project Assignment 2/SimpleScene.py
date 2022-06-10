@@ -32,7 +32,6 @@ H_DRAG = 1
 V_DRAG = 2
 sixCow = [0, 1, 2, 3, 4, 5]
 progress = -1
-previous = None
 interpolate = [0, 1, 2, 3, 4, 5]
 animStartTime = 0
 # dragging state
@@ -400,14 +399,13 @@ def initialize(window):
 
 
 def onMouseButton(window, button, state, mods):
-    global isDrag, V_DRAG, H_DRAG, progress, sixCow, isMove, previous
+    global isDrag, V_DRAG, H_DRAG, progress, sixCow, isMove
     GLFW_DOWN = 1
     GLFW_UP = 0
     x, y = glfw.get_cursor_pos(window)
     if button == glfw.MOUSE_BUTTON_LEFT:
         if state == GLFW_DOWN:
             isDrag = V_DRAG
-            previous = None
             print("Left mouse down-click at %d %d\n" % (x, y))
             # start vertical dragging
         elif state == GLFW_UP and isDrag != 0:
@@ -451,7 +449,7 @@ def getPickInfo(window, x, y):
 
 
 def onMouseDrag(window, x, y):
-    global isDrag, cursorOnCowBoundingBox, pickInfo, cow2wld, isMove, previous
+    global isDrag, cursorOnCowBoundingBox, pickInfo, cow2wld, isMove
 
     if isDrag:
         print("in drag mode %d\n" % isDrag)
@@ -463,13 +461,8 @@ def onMouseDrag(window, x, y):
             if cursorOnCowBoundingBox:
                 ray = screenCoordToRay(window, x, y)
                 pp = pickInfo
-                if previous is None:
-                    pass
-                    # tmp = -ray.direction
-                    # tmp[1] = 0
-                    # normalize(tmp)
-                previous = Plane(-ray.direction, pp.cowPickPosition)
-                c = ray.intersectsPlane(previous)
+                p = Plane(-ray.direction, pp.cowPickPosition)
+                c = ray.intersectsPlane(p)
 
                 currentPos = ray.getPoint(c[1])
                 # print(pp.cowPickPosition, currentPos)
